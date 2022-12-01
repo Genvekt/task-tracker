@@ -1,0 +1,1 @@
+from task_admin.db.mappings import mapper_registry
