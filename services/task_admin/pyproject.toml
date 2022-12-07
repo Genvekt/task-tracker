@@ -12,6 +12,9 @@ sqlalchemy = "^1.4.44"
 pytest = "^7.2.0"
 psycopg2-binary = "^2.9.5"
 wemake-python-styleguide = "^0.17.0"
+fastapi = "^0.88.0"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+alembic = "^1.8.1"
 
 
 [build-system]
