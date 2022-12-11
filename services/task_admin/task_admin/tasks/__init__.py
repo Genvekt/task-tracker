@@ -1,1 +1,1 @@
-from task_admin.tasks.views import task_list
+from task_admin.tasks import views
