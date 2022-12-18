@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated class="">
-      <q-toolbar>
+      <q-toolbar v-if="loggedIn">
         <q-btn
           flat
           dense
@@ -14,7 +14,9 @@
         <q-toolbar-title>
           <router-link to="/">Tasks</router-link>
         </q-toolbar-title>
-
+        <q-btn-dropdown v-if="loggedIn" flat :label="userName">
+          <q-btn flat label="Logout" v-close-popup @click="logOut" />
+        </q-btn-dropdown>
         <div></div>
       </q-toolbar>
     </q-header>
@@ -99,11 +101,33 @@
 <script>
 export default {
   name: "LayoutDefault",
-
+  beforeCreate() {
+    if (!this.$store.state.auth.status.loggedIn) {
+      this.$router.push("login");
+    }
+  },
   data() {
     return {
       leftDrawerOpen: false,
     };
+  },
+  computed: {
+    loggedIn() {
+      return this.$store.state.auth.status.loggedIn;
+    },
+    userName() {
+      if (this.loggedIn) {
+        return JSON.parse(localStorage.getItem("user"))["user"]["name"];
+      } else {
+        return "";
+      }
+    },
+  },
+  methods: {
+    logOut() {
+      this.$store.dispatch("auth/logout");
+      this.$router.push("/login");
+    },
   },
 };
 </script>

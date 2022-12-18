@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 import TaskList from "../views/TaskList.vue";
+import LoginPage from "../views/Login.vue";
 
 const routes = [
   {
     path: "/",
     name: "taskList",
     component: TaskList,
+  },
+  {
+    path: "/login",
+    name: "loginPage",
+    component: LoginPage,
   },
 ];
 
