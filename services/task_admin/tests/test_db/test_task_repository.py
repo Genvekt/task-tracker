@@ -5,8 +5,8 @@ from task_admin.tasks.models import Task, TaskStatus
 
 def insert_user(db_session) -> User:
     db_session.execute(
-        "INSERT INTO users (id, name) VALUES "
-        "(1, 'lupa')"
+        "INSERT INTO users (id, name, public_id, email) VALUES "
+        "(1, 'lupa', 2, 'lupa@mail.com')"
     )
     return db_session.query(User).filter_by(name='lupa').first()
 
@@ -38,7 +38,7 @@ def test_repository_can_save_a_task(db_session):
 
 def test_repository_can_retrieve_a_task_with_user(db_session):
     user = insert_user(db_session)
-    task = insert_task(db_session, user)
+    insert_task(db_session, user)
 
     repo = TaskRepository(session=db_session)
     retrieved_task = repo.get(id=1)
