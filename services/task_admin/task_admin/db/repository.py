@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from task_admin.auth.models import User
-from task_admin.tasks.models import Task
+from task_admin.tasks.models import Task, TaskStatus
 
 
 class TaskRepository:
@@ -14,7 +14,10 @@ class TaskRepository:
     def get(self, id: int) -> Optional[Task]:
         return self.session.query(Task).filter_by(id=id).first()
 
-    def list(self)-> List[Task]:
+    def list_open(self) -> List[Task]:
+        return self.session.query(Task).filter_by(status=TaskStatus.in_progress.value).all()
+
+    def list(self) -> List[Task]:
         return self.session.query(Task).all()
 
 

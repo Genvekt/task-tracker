@@ -19,7 +19,7 @@
       <q-item-label>{{ task.title }}</q-item-label>
       <q-item-label caption> Description: {{ task.description }} </q-item-label>
       <q-item-label caption>
-        Assigned to: {{ task.assignee.name }}
+        {{ assigneeString }}
       </q-item-label>
     </q-item-section>
   </q-item>
@@ -40,6 +40,13 @@ export default {
   computed: {
     isDone() {
       return this.task.status == "Done" ? true : false;
+    },
+    assigneeString() {
+      if (this.task.assignee) {
+        return `Assigned to: ${this.task.assignee.name}`;
+      } else {
+        return `Unassigned.`;
+      }
     },
   },
   methods: {

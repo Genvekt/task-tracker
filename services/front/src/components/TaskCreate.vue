@@ -18,13 +18,6 @@
       label="Description"
       lazy-rules
     />
-    <q-select
-      class="col-2"
-      filled
-      v-model="newTask.user"
-      :options="options"
-      label="Assignee"
-    />
     <q-btn
       class="col-1"
       icon="far fa-plus"
@@ -56,19 +49,8 @@ export default {
       newTask: {
         title: "",
         description: "",
-        user: "",
       },
     };
-  },
-  created() {
-    db.getList("users").then((data) => {
-      this.options = data.map((user) => {
-        return {
-          value: user.id,
-          label: user.name,
-        };
-      });
-    });
   },
   methods: {
     onSubmit: function () {
@@ -76,14 +58,12 @@ export default {
       db.createOne("tasks", {
         title: this.newTask.title,
         description: this.newTask.description,
-        user_id: parseInt(this.newTask.user.value),
       })
         .then((task) => {
           this.loading = false;
           this.newTask = {
             title: "",
             description: "",
-            user: "",
           };
           return this.$emit("taskCreated", task);
         })
@@ -104,7 +84,6 @@ export default {
       this.newTask = {
         title: "",
         description: "",
-        user: "",
       };
     },
   },

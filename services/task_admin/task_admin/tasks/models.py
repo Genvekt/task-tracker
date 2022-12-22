@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import Optional
+
 from task_admin.auth.models import User
 
 
@@ -12,7 +14,7 @@ class Task:
             self,
             title: str,
             description: str,
-            assignee: User,
+            assignee: Optional[User],
             status: TaskStatus = TaskStatus.in_progress
     ):
         """Single task initialization."""
@@ -23,11 +25,14 @@ class Task:
 
     def __eq__(self, other):
         return (
-            isinstance(other, self.__class__),
-            other.title == self.title,
-            other.description == self.description,
-            other.status == self.status,
-            other.assignee == self.assignee
+            isinstance(other, self.__class__)
+            and other.title == self.title
+            and other.description == self.description
+            and other.status == self.status
+            and (
+                (other.assignee is None and self.assignee is None)
+                or other.assignee == self.assignee
+            )
         )
 
     def close(self) -> None:

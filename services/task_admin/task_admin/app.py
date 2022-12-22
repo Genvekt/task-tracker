@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from task_admin import tasks, auth
+from task_admin.tasks.views import router as task_router
+from task_admin.auth.views import router as user_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-app.include_router(tasks.views.router)
-app.include_router(auth.views.router)
+app.include_router(task_router)
+app.include_router(user_router)
 
 origins = [
     "http://localhost:8080",
