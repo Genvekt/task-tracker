@@ -5,7 +5,7 @@ const DataProviderBase = (server) => ({
     console.log(resource);
     return server
       .get(resource, { headers: authHeader() })
-      .then((response) => response.data);
+      .then((response) => response.data.collection);
   },
   getOne: (resource, id) => {
     return server

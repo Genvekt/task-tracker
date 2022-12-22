@@ -5,9 +5,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from auth.models import User
-from auth.schemas import TokenSchema, UserSchema, UserCreateSchema, UserUpdateSchema
+from auth.schemas import TokenSchema, UserSchema, UserCreateSchema, UserUpdateSchema, JWK
 from auth.services.hash import verify_password
-from auth.services.token import create_access_token
+from auth.services.token import create_access_token, generate_jwk, get_jwk_fingerprint
 from auth.services.user import authenticate_user, authenticate_admin_user
 from auth.settings import ACCESS_TOKEN_EXPIRES
 
@@ -129,3 +129,10 @@ async def authenticate(encoded_token: str = Depends(oauth2_scheme), db: Session 
         raise HTTPException(status_code=401, detail="Invalid auth token.")
 
     return user
+
+
+@auth_router.get("/jwk.json", response_model=JWK)
+def jwk_json():
+    #print(get_jwk_fingerprint())
+    jwk_dict = generate_jwk()
+    return {"keys": [jwk_dict]}
