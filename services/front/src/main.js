@@ -24,7 +24,7 @@ app.use(store);
 
 export const db = DataProvider(
   axios.create({
-    baseURL: `http://localhost:8000/api/`,
+    baseURL: `http://localhost:5555/v1/task-manager/`,
     headers: {
       Authorization: "Bearer {token}",
     },

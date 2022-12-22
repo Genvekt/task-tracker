@@ -45,3 +45,16 @@ class TokenSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class PublicKey(BaseModel):
+    alg: str
+    use: str
+    kid: str
+    kty: str
+    n: str
+    e: str
+
+
+class JWK(BaseModel):
+    keys: list[PublicKey]

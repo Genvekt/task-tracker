@@ -19,6 +19,6 @@ PRIVATE_KEY_PATH = os.getenv(
 )
 
 PUBLIC_KEY_PATH = os.getenv(
-    "PRIVATE_KEY_PATH",
+    "PUBLIC_KEY_PATH",
     "/Users/genvekt/PycharmProjects/task-tracker/services/auth/auth/data/jwt-key.pub"
 )

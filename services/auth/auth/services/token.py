@@ -1,10 +1,15 @@
+import json
+
 from auth.models import Token
+from authlib.jose import jwk
 from fastapi import Request
 from datetime import timedelta, datetime, timezone
 from auth.settings import PUBLIC_KEY_PATH, PRIVATE_KEY_PATH
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 import jwt
+import hashlib
+import base64
 
 
 def get_private_key():
@@ -42,7 +47,11 @@ def create_access_token(
             "roles": roles,
         },
         key=secret_key,
-        algorithm="RS256")
+        algorithm="RS256",
+        headers={
+            "kid": "cHVibGljLWtleS1pZA"
+        }
+    )
     return Token(access_token=encoded_jwt)
 
 
@@ -54,3 +63,23 @@ def decode_token(token: str):
         algorithms=["RS256"],
     )
     return decoded
+
+
+def generate_jwk() -> dict:
+    key = get_public_key()
+    key_data = jwk.dumps(key, kty='RSA')
+    return {
+        "kid": "cHVibGljLWtleS1pZA",
+        "alg": "RS256",
+        "kty": "RSA",
+        "use": "sig",
+        "n": key_data["n"],
+        "e": key_data["e"],
+    }
+
+
+def get_jwk_fingerprint() -> str:
+    jwk = generate_jwk()
+    jwk_str = json.dumps({"e": jwk["e"], "kty": jwk["kty"], "n": jwk["n"]})
+    jwk_encoded = hashlib.sha256(jwk_str.encode('utf-8')).digest()
+    return base64.urlsafe_b64encode(jwk_encoded).decode('utf-8')
