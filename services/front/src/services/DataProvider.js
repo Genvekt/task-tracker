@@ -25,6 +25,14 @@ const DataProviderBase = (server) => ({
         throw error;
       });
   },
+  reassignTasks: () => {
+    return server
+      .post("tasks/reassign", {}, { headers: authHeader() })
+      .then((response) => response.data)
+      .catch(function (error) {
+        throw error;
+      });
+  },
 });
 
 export const DataProvider = (server) => ({

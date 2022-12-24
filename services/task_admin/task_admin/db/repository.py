@@ -28,8 +28,11 @@ class UserRepository:
     def add(self, task: User) -> None:
         self.session.add(task)
 
-    def get(self, id: int) -> Optional[User]:
-        return self.session.query(User).filter_by(id=id).first()
+    def get(self, email: str = "", id: int = 0) -> Optional[User]:
+        if id > 0:
+            return self.session.query(User).filter_by(id=id).first()
+        else:
+            return self.session.query(User).where(User.email == email).first()
 
     def list(self) -> List[User]:
         return self.session.query(User).all()

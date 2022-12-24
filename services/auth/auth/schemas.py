@@ -18,6 +18,7 @@ class RoleSchema(RoleBaseSchema):
 
 
 class UserBaseSchema(BaseModel):
+    public_id: str
     name: str
     email: str
     roles: list[RoleSchema]

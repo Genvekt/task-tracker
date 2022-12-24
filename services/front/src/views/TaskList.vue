@@ -21,6 +21,14 @@
         </div>
       </q-list>
     </div>
+    <div class="column q-mt-md items-center">
+      <q-btn
+        class="col-2"
+        color="primary"
+        label="Reassign tasks"
+        @click="reassignTrigger"
+      />
+    </div>
     <q-footer elevated>
       <error-alert :message="this.alertMessage" :show="this.alertShow" />
     </q-footer>
@@ -50,9 +58,7 @@ export default {
     };
   },
   created() {
-    db.getList("tasks").then((data) => {
-      this.tasks = data;
-    });
+    this.reloadTaskList();
   },
   methods: {
     addCreatedTask: function (task) {
@@ -64,6 +70,14 @@ export default {
       setTimeout(() => {
         this.alertShow = false;
       }, 2000);
+    },
+    reassignTrigger: function () {
+      db.reassignTasks().then(() => this.reloadTaskList());
+    },
+    reloadTaskList: function () {
+      db.getList("tasks").then((data) => {
+        this.tasks = data;
+      });
     },
   },
 };

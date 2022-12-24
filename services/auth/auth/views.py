@@ -1,3 +1,7 @@
+import asyncio
+import uuid
+
+from auth.broker.events import UserCreatedEvent
 from auth.db.connection import get_db
 from auth.db.repositories import UserRepository, RoleRepository
 from fastapi import Depends, APIRouter, HTTPException
@@ -11,6 +15,7 @@ from auth.services.token import create_access_token, generate_jwk, get_jwk_finge
 from auth.services.user import authenticate_user, authenticate_admin_user
 from auth.settings import ACCESS_TOKEN_EXPIRES
 
+event_queue = asyncio.Queue()
 
 user_router = APIRouter(
     prefix="/api/users",
@@ -50,12 +55,18 @@ async def user_create(
 
     user_repo = UserRepository(db)
     user = User(
+        public_id=str(uuid.uuid4()),
         name=data.name,
         email=data.email,
         password=data.password
     )
     user_repo.add(user)
     db.commit()
+    await event_queue.put(UserCreatedEvent(
+        public_id=user.public_id,
+        name=user.name,
+        email=user.email,
+    ))
     return "0k", 200
 
 
