@@ -5,7 +5,7 @@
     class="q-gutter-md row self-center q-px-md"
   >
     <q-input
-      class="col-2"
+      class="col-4"
       filled
       v-model="newTask.title"
       label="Title"

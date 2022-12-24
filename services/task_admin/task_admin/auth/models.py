@@ -2,12 +2,12 @@ import uuid
 
 
 class User:
-    def __init__(self, name: str, email: str, public_id: int = None):
+    def __init__(self, name: str, email: str, public_id: str = None):
         """User initialisation."""
         self.name = name
         self.email = email
         if public_id is None:
-            self.public_id = int(uuid.uuid4())
+            self.public_id = str(uuid.uuid4())
         else:
             self.public_id = public_id
 

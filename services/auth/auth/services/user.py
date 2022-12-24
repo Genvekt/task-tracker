@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional
 from sqlalchemy.orm import Session
 
@@ -44,6 +45,7 @@ def add_admin_user():
         return
 
     user = User(
+        public_id=str(uuid.uuid4()),
         name="Admin",
         email="admin@email.com",
         password=ADMIN_PASSWORD

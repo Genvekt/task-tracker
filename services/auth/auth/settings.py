@@ -22,3 +22,13 @@ PUBLIC_KEY_PATH = os.getenv(
     "PUBLIC_KEY_PATH",
     "/Users/genvekt/PycharmProjects/task-tracker/services/auth/auth/data/jwt-key.pub"
 )
+
+RABBITMQ_URL = os.getenv(
+    "RABBITMQ_URL",
+    "amqp://guest:guest@127.0.0.1:5672"
+)
+
+USER_EVENTS_EXCHANGE = os.getenv(
+    "USER_EVENTS_EXCHANGE",
+    "user_events_exchange"
+)

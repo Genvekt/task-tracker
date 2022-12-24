@@ -1,4 +1,8 @@
+import asyncio
+
 from fastapi import FastAPI
+
+from task_admin.broker.connection import Consumer
 from task_admin.tasks.views import router as task_router
 from task_admin.auth.views import router as user_router
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.include_router(task_router)
 app.include_router(user_router)
+consumer = Consumer()
 
 origins = [
     "http://localhost:8080",
@@ -21,3 +26,9 @@ app.add_middleware(
 @app.get("/api")
 async def root():
     return {"message": "Hello Bigger Applications!"}
+
+
+@app.on_event('startup')
+async def start_up():
+    loop = asyncio.get_running_loop()
+    loop.create_task(consumer.start())
