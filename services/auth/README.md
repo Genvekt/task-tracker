@@ -7,7 +7,7 @@ Only public key is available for outside world, which protects system from being
 The following diagram illustrates the flow of user authentication and authorization
 in the system.
 
-![](/media/auth-flow.png)
+![](../../media/auth-flow.png)
 
 ### Manually setup secret keys for token validation
 Dockerfile already designed to setup keys on creation, however for local run the keys may be created as follows:
