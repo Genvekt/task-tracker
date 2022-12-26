@@ -1,9 +1,12 @@
+import asyncio
+
+from task_admin.broker.events import TaskCompletedEvent
 from task_admin.db.connection import get_db
 from task_admin.db.repository import TaskRepository
 from fastapi import Depends, APIRouter, HTTPException, Response
 from sqlalchemy.orm import Session
 
-from task_admin.tasks.models import Task
+from task_admin.tasks.models import Task, TaskStatus
 from task_admin.tasks.schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema, TaskListSchema
 from task_admin.tasks.services import reassign_open_tasks
 
@@ -11,6 +14,8 @@ router = APIRouter(
     prefix="/api/tasks",
     tags=["tasks"],
 )
+
+event_queue = asyncio.Queue()
 
 
 @router.get("/", response_model=TaskListSchema)
@@ -49,7 +54,12 @@ async def update_item(task_id: int, data: TaskUpdateSchema, db: Session = Depend
 
     task.status = data.status
     db.commit()
-
+    if task.status == TaskStatus.done:
+        await event_queue.put(TaskCompletedEvent(
+            title=task.title,
+            description=task.description,
+            assignee_public_id=task.assignee.public_id,
+        ))
     return task
 
 

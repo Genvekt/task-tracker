@@ -8,10 +8,20 @@ from aio_pika.exchange import ExchangeType
 from task_admin.auth.models import User
 from task_admin.db.connection import SessionLocal
 from task_admin.db.repository import UserRepository
-from task_admin.settings import RABBITMQ_URL, USER_EVENTS_EXCHANGE, USER_EVENTS_QUEUE
+from task_admin.settings import (
+    RABBITMQ_URL,
+    USER_EVENTS_EXCHANGE,
+    USER_EVENTS_QUEUE,
+    TASK_EVENTS_EXCHANGE
+)
 
 
 class Consumer:
+    def __init__(self, event_queue: asyncio.Queue):
+        self._is_stopped = asyncio.Future()
+        self._is_stopped.set_result(True)
+        self._queue = event_queue
+
     async def start(self):
         self._is_stopped = asyncio.Future()
         connection = await aio_pika.connect(
@@ -26,8 +36,8 @@ class Consumer:
         # Declaring queue
         queue = await channel.declare_queue(USER_EVENTS_QUEUE, auto_delete=False)
         await queue.bind(exchange)
-
         asyncio.create_task(queue.consume(self.process_message))
+        await self.run_publisher(connection=connection)
 
     async def process_message(self, message: AbstractIncomingMessage):
         async with message.process(requeue=True, ignore_processed=True):
@@ -49,3 +59,24 @@ class Consumer:
                     db.close()
                 except Exception as e:
                     await message.reject(requeue=True)
+
+    async def run_publisher(self, connection: aio_pika.connection.AbstractConnection):
+        channel = await connection.channel()
+        exchange = await channel.declare_exchange(
+            name=TASK_EVENTS_EXCHANGE,
+            type=ExchangeType.FANOUT
+        )
+        while not self._is_stopped.done():
+            finished, unfinished = await asyncio.wait([
+                self._is_stopped,
+                asyncio.create_task(self._queue.get())
+            ], return_when=asyncio.FIRST_COMPLETED)
+            for task in finished:
+                event = task.result()
+                if isinstance(event, bool):
+                    continue
+                await exchange.publish(
+                    aio_pika.Message(body=f"{json.dumps(event.dict())}".encode()),
+                    routing_key=event.__class__.__name__,
+                )
+                print(f"Message was published {event}")
