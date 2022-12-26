@@ -2,7 +2,7 @@ from pydantic.main import BaseModel
 
 
 class UserBaseSchema(BaseModel):
-    public_id: int
+    public_id: str
     name: str
     email: str
 
