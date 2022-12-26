@@ -1,6 +1,6 @@
 import asyncio
 
-from task_admin.broker.events import TaskCompletedEvent
+from task_admin.broker.events import TaskCompletedEvent, TaskAssignedEvent
 from task_admin.db.connection import get_db
 from task_admin.db.repository import TaskRepository
 from fastapi import Depends, APIRouter, HTTPException, Response
@@ -65,7 +65,13 @@ async def update_item(task_id: int, data: TaskUpdateSchema, db: Session = Depend
 
 @router.post("/reassign")
 async def reassign_tasks(db: Session = Depends(get_db)):
-    reassign_open_tasks(db=db)
+    tasks = reassign_open_tasks(db=db)
     db.commit()
+    for task in tasks:
+        await event_queue.put(TaskAssignedEvent(
+            title=task.title,
+            description=task.description,
+            assignee_public_id=task.assignee.public_id
+        ))
 
     return Response(status_code=200)

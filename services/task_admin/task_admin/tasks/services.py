@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 from task_admin.db.repository import TaskRepository, UserRepository
 import random
@@ -5,7 +7,7 @@ import random
 from task_admin.tasks.models import Task
 
 
-def reassign_open_tasks(db: Session):
+def reassign_open_tasks(db: Session) -> List[Task]:
     task_repo = TaskRepository(db)
     open_tasks: list[Task] = task_repo.list_open()
 
@@ -15,4 +17,7 @@ def reassign_open_tasks(db: Session):
     for task in open_tasks:
         lucky_user = random.choice(users)
         task.assignee = lucky_user
+
+    return open_tasks
+
 

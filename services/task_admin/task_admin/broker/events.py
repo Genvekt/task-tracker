@@ -8,3 +8,12 @@ class TaskCompletedEvent:
     assignee_public_id: str
 
     dict = asdict
+
+
+@dataclass
+class TaskAssignedEvent:
+    title: str
+    description: str
+    assignee_public_id: str
+
+    dict = asdict
