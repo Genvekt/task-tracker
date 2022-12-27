@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timezone
 
 from task_admin.broker.events import TaskCompletedEvent, TaskAssignedEvent
 from task_admin.db.connection import get_db
@@ -59,6 +60,7 @@ async def update_item(task_id: int, data: TaskUpdateSchema, db: Session = Depend
             title=task.title,
             description=task.description,
             assignee_public_id=task.assignee.public_id,
+            ts=datetime.now(tz=timezone.utc),
         ))
     return task
 
@@ -71,7 +73,8 @@ async def reassign_tasks(db: Session = Depends(get_db)):
         await event_queue.put(TaskAssignedEvent(
             title=task.title,
             description=task.description,
-            assignee_public_id=task.assignee.public_id
+            assignee_public_id=task.assignee.public_id,
+            ts=datetime.now(tz=timezone.utc),
         ))
 
     return Response(status_code=200)
