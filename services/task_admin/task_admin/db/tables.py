@@ -10,7 +10,7 @@ users_table = Table(
     "users",
     metadata,
     Column("id", BigInteger, primary_key=True, autoincrement=True),
-    Column("public_id", BigInteger, unique=True),
+    Column("public_id", String(100), unique=True),
     Column("name", String(255), nullable=False),
     Column("email", String(255), nullable=False, unique=True)
 )

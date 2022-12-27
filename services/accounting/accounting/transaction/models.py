@@ -3,6 +3,7 @@ from enum import Enum
 
 from accounting.auth.models import User
 
+
 class TransactionType(Enum):
     task_assigned = "TaskAssigned"
     task_completed = "TaskCompleted"

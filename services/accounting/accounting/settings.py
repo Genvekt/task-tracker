@@ -18,5 +18,15 @@ TASK_EVENTS_EXCHANGE = os.getenv(
 
 TASK_EVENTS_QUEUE = os.getenv(
     "USER_EVENTS_QUEUE",
-    "accounting_consumer"
+    "accounting_task_consumer"
+)
+
+USER_EVENTS_EXCHANGE = os.getenv(
+    "USER_EVENTS_EXCHANGE",
+    "user_events_exchange"
+)
+
+USER_EVENTS_QUEUE = os.getenv(
+    "USER_EVENTS_QUEUE",
+    "accounting_user_consumer"
 )
