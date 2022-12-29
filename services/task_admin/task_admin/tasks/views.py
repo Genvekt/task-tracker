@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timezone
 
-from task_admin.broker.events import TaskCompletedEvent, TaskAssignedEvent
+from library.rmq_broker.events import TaskCompletedEvent, TaskAssignedEvent
 from task_admin.db.connection import get_db
 from task_admin.db.repository import TaskRepository
 from fastapi import Depends, APIRouter, HTTPException, Response
@@ -10,13 +10,12 @@ from sqlalchemy.orm import Session
 from task_admin.tasks.models import Task, TaskStatus
 from task_admin.tasks.schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema, TaskListSchema
 from task_admin.tasks.services import reassign_open_tasks
+from task_admin.broker.connection import publisher_event_queue
 
 router = APIRouter(
     prefix="/api/tasks",
     tags=["tasks"],
 )
-
-event_queue = asyncio.Queue()
 
 
 @router.get("/", response_model=TaskListSchema)
@@ -56,7 +55,7 @@ async def update_item(task_id: int, data: TaskUpdateSchema, db: Session = Depend
     task.status = data.status
     db.commit()
     if task.status == TaskStatus.done:
-        await event_queue.put(TaskCompletedEvent(
+        await publisher_event_queue.put(TaskCompletedEvent(
             title=task.title,
             description=task.description,
             assignee_public_id=task.assignee.public_id,
@@ -70,7 +69,7 @@ async def reassign_tasks(db: Session = Depends(get_db)):
     tasks = reassign_open_tasks(db=db)
     db.commit()
     for task in tasks:
-        await event_queue.put(TaskAssignedEvent(
+        await publisher_event_queue.put(TaskAssignedEvent(
             title=task.title,
             description=task.description,
             assignee_public_id=task.assignee.public_id,
