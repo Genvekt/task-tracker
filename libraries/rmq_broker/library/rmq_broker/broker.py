@@ -91,7 +91,7 @@ class Consumer:
             message_type = message.headers.get("MessageType")
             if message_type in self._handlers and message_type in self._schemas:
                 try:
-                    event_data = json.loads(message.body.decode())
+                    event_data = message.body.decode("utf8")
                     event_schema = self._schemas[message_type]
                     event = event_schema.loads(event_data)
                     self._handlers[message_type](event, self._logger)
