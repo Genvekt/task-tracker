@@ -6,6 +6,7 @@ authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
+"library.rmq_broker" = { path = "../../libraries/rmq_broker", develop = true }
 python = "^3.11"
 alembic = "^1.9.1"
 psycopg2-binary = "^2.9.5"

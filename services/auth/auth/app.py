@@ -2,13 +2,13 @@ import asyncio
 
 from fastapi import FastAPI
 
-from auth.broker.connection import Publisher
-from auth.views import user_router, auth_router, event_queue
+from auth.broker.connection import get_rmq_broker
+from auth.views import user_router, auth_router
 from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
-rmq_publisher = Publisher(event_queue=event_queue)
+broker = get_rmq_broker()
 
 from auth.services.user import add_admin_user
 add_admin_user()
@@ -31,11 +31,9 @@ app.add_middleware(
 @app.on_event('startup')
 async def start_up():
     loop = asyncio.get_running_loop()
-    loop.create_task(rmq_publisher.start())
+    loop.create_task(broker.start())
 
 
 @app.on_event('shutdown')
 async def start_up():
-    loop = asyncio.get_running_loop()
-    task = loop.create_task(rmq_publisher.stop())
-    await task
+    broker.stop()
