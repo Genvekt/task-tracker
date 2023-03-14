@@ -1,4 +1,5 @@
 from typing import Optional, List
+from datetime import date, timedelta
 
 from accounting.auth.models import User
 from accounting.transaction.models import Transaction
@@ -14,8 +15,13 @@ class TransactionRepository:
     def get(self, id: int) -> Optional[Transaction]:
         return self.session.query(Transaction).filter_by(id=id).first()
 
-    def list(self) -> List[Transaction]:
-        return self.session.query(Transaction).all()
+    def list(self, user: User = None, date: date = None) -> List[Transaction]:
+        query = self.session.query(Transaction)
+        if user is not None:
+            query = query.filter_by(user=user)
+        if date is not None:
+            query = query.where(Transaction.ts > date, Transaction.ts < date + timedelta(days=1))
+        return query.all()
 
 
 class UserRepository:

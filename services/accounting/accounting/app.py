@@ -3,10 +3,12 @@ import asyncio
 from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
+from accounting.transaction.views import router as transaction_router
 
 from accounting.broker.connection import get_rmq_broker
 
 app = FastAPI()
+app.include_router(transaction_router)
 
 event_queue = asyncio.Queue()
 broker = get_rmq_broker()
