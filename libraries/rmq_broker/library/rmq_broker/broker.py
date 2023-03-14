@@ -195,7 +195,7 @@ class RMQBroker:
         routing_key: str,
         handlers: Dict[str, Handler],
         schemas: Dict[str, Schema],
-    ):
+    ) -> None:
         """
         Adds consumer to broker.
         Args:
@@ -223,7 +223,7 @@ class RMQBroker:
         schemas: Dict[str, Schema],
         queue_name: str | None = None,
         routing_key: str | None = None
-    ):
+    ) -> None:
         """
         Sets publisher to broker.
         Args:
@@ -262,7 +262,7 @@ class RMQBroker:
                 connection=self._connection
             )
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops all running consumers and publisher."""
         self._is_stopped.set_result(True)
         for consumer_task in self._running_consumers:
