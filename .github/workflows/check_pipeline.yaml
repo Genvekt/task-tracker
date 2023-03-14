@@ -179,7 +179,7 @@ jobs:
   build:
     needs: [define_service_list, run_lib_checks, run_service_checks]
     if: ${{ always() && (toJSON(fromJSON(needs.define_service_list.outputs.matrix).service_name) != '[]') && (github.event_name == 'workflow_dispatch' || needs.define_service_list.outputs.branch == 'main') && (needs.run_lib_checks.result == 'success' || needs.run_lib_checks.result == 'skipped') && (needs.run_service_checks.result == 'success')}}
-    runs-on: [self-hosted, first]
+    runs-on: [ubuntu-latest]
     strategy:
       matrix:
         service_name: ${{fromJSON(needs.define_service_list.outputs.matrix).service_name}}

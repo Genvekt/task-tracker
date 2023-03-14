@@ -1,5 +1,4 @@
 import asyncio
-import json
 import logging
 from logging import Logger
 from typing import Callable, Dict
