@@ -30,7 +30,9 @@ jobs:
           echo "MATRIX_JSON=$output" >> $GITHUB_ENV
 
       - name: Print detected changes
-        run: echo "$MATRIX_JSON"
+        run: |
+          echo "$MATRIX_JSON"
+          echo "${GITHUB_REF##*/}"
 
       # Step for setting list of changed services for next jobs
       - name: Set matrix value
