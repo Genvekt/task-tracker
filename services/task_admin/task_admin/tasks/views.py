@@ -43,7 +43,6 @@ async def task_create(data: TaskCreateSchema, db: Session = Depends(get_db)):
     )
     task_repo.add(task)
     db.commit()
-
     return task
 
 

@@ -230,6 +230,8 @@ class RMQBroker:
             exchange_name: Name of exchange for publishing
             event_queue: Internal queue with events to publish
             schemas: Mapping from string type to the Event schema
+            queue_name (optional): Optional queue to bind with auto_delete=False
+            routing_key (optional): Routing key for optional queue
         """
         self.publisher = Publisher(
             exchange_name=exchange_name,

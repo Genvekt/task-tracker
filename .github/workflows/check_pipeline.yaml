@@ -1,0 +1,207 @@
+name: Check Pipeline
+
+
+on:
+  push:                 # Automatic trigger on push to any branch
+
+jobs:
+
+  # Job that defines list of changed services
+  define_service_list:
+    runs-on: [ubuntu-latest]
+    outputs:
+      matrix: ${{ steps.set_matrix.outputs.changed_services }}
+      branch: ${{ steps.branch_name.outputs.triggered_branch }}
+    steps:
+      # Install toml
+      - uses: actions/checkout@v2
+      - name: Install toml
+        run: pip3 install toml
+
+      # Remember the name of branch
+      - name: Identify branch name
+        id: branch_name
+        run: echo "::set-output name=triggered_branch::${GITHUB_REF##*/}"
+
+      # Identify changes
+      - name: Find changed files
+        run: |
+          output=$(python3 .github/scripts/git_get_changed_servises.py ${GITHUB_REF##*/} ${{secrets.GITHUB_TOKEN}} ${GITHUB_SHA})
+          echo "MATRIX_JSON=$output" >> $GITHUB_ENV
+
+      # Step for setting list of changed services for next jobs
+      - name: Set matrix value
+        id: set_matrix
+        run: |
+          echo "::set-output name=changed_services::$MATRIX_JSON"
+
+  # Job that runs tests, flake8 and mypy for each changed library
+  # Will start if
+  #  - List of changed libraries is NOT EMPTY
+  run_lib_checks:
+    needs: define_service_list
+    if: ${{ toJSON(fromJSON(needs.define_service_list.outputs.matrix).library_name) != '[]' }}
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        library_name: ${{fromJSON(needs.define_service_list.outputs.matrix).library_name}}
+      fail-fast: false
+
+    steps:
+      # TODO: flake8 and mypy checks
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - uses: actions/checkout@v2
+
+      - name: Check tests exist
+        id: check_tests_exist
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "./libraries/${{matrix.library_name}}/tests/__init__.py"
+
+      # Runs always due to flake8 checks
+      - name: Install poetry
+        id: install_poetry
+        run: |
+          curl -sSL 'https://install.python-poetry.org' | python - 
+          poetry --version 
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+
+      - name: Install dependencies
+        if: steps.install_poetry.outcome == 'success'
+        run: |
+          cd libraries/${{matrix.library_name}}
+          poetry install --no-interaction --no-ansi -vvv
+          rm -rf $POETRY_CACHE_DIR
+
+      # make flake8 check
+#      - name: Flake8 check
+#        continue-on-error: false
+#        run: |
+#          cd libraries/${{matrix.library_name}}
+#          source .venv/bin/activate
+#          flake8 --config=../../setup.cfg --statistics --count .
+
+      - name: Run tests
+        if: steps.check_tests_exist.outputs.files_exists == 'true'
+        run: |
+          cd libraries/${{matrix.library_name}}
+          source .venv/bin/activate
+          pytest tests
+ 
+ 
+ 
+
+  # Job that runs tests, flake8 and mypy for each changed service
+  # Will start if
+  #  - List of changed services is NOT EMPTY
+  run_service_checks:
+    needs: define_service_list
+    if: ${{ toJSON(fromJSON(needs.define_service_list.outputs.matrix).service_name) != '[]' }}
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        service_name: ${{fromJSON(needs.define_service_list.outputs.matrix).service_name}}
+      fail-fast: false
+
+    services:
+      # PostrgeSQL database for tests
+      postgres:
+        image: postgres
+        # Creds for postgres
+        env:
+          POSTGRES_DB: "db-test"
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "mysecretpassword"
+        ports:
+          - "5432:5432"
+        # Health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      # TODO: flake8 and mypy checks
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - uses: actions/checkout@v2
+
+      - name: Check tests exist
+        id: check_tests_exist
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "./services/${{matrix.service_name}}/tests/__init__.py"
+
+      # Runs if there is docs to push or if there is tests
+      - name: Install poetry
+        if: ${{ always() && (steps.check_tests_exist.outputs.files_exists == 'true') }}
+        id: install_poetry
+        run: |
+          curl -sSL 'https://install.python-poetry.org' | python - 
+          poetry --version 
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+
+      - name: Install dependencies
+        if: steps.install_poetry.outcome == 'success'
+        run: |
+          cd services/${{matrix.service_name}}
+          poetry install --no-interaction --no-ansi -vvv
+          rm -rf $POETRY_CACHE_DIR
+
+      # DOCS PUBLISH
+      #   Will run only on push to master or manual run
+      #   We do it here to reuse already installed packages and reduce workflow overall runtime
+      - name: Publish docs
+        if: ${{ always() && steps.check_docs_exist.outcome == 'success' && steps.check_docs_exist.outputs.files_exists == 'true' }}
+        continue-on-error: true
+        run: |
+          cd services/${{matrix.service_name}}
+          source .venv/bin/activate
+          sphinx-build -b confluence -c ../../docs/docs/source docs/source docs/build/confluence -E -a
+        env:
+          ATLASSIAN_API_KEY: ${{ secrets.ATLASSIAN_API_KEY }}
+          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
+          PUBLISH: 'True'
+
+      - name: Run tests
+        if: steps.check_tests_exist.outputs.files_exists == 'true'
+        run: |
+          cd services/${{matrix.service_name}}
+          source .venv/bin/activate
+          pytest tests
+
+
+
+  # Job that builds service containers
+  # Will start if:
+  #  - List of changed services is NOT EMPTY
+  #  - Event type is workflow_dispatch (manual run) OR push made into master branch
+  #  - run_service_checks job is successful for all services in list
+  #  - run_lib_checks job is successful for all changed libraries or is skipped
+  build:
+    needs: [define_service_list, run_lib_checks, run_service_checks]
+    if: ${{ always() && (toJSON(fromJSON(needs.define_service_list.outputs.matrix).service_name) != '[]') && (github.event_name == 'workflow_dispatch' || needs.define_service_list.outputs.branch == 'master') && (needs.run_lib_checks.result == 'success' || needs.run_lib_checks.result == 'skipped') && (needs.run_service_checks.result == 'success')}}
+    runs-on: [self-hosted, first]
+    strategy:
+      matrix:
+        service_name: ${{fromJSON(needs.define_service_list.outputs.matrix).service_name}}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check Dockerfile exists
+        id: check_dockerfile_exist
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "./services/${{matrix.service_name}}/Dockerfile"
+
+      - name: Check build for ${{matrix.service_name}}
+        if: (matrix.service_name != 'admin_front') && (steps.check_dockerfile_exist.outputs.files_exists == 'true')
+        run: docker build -f ./services/${{matrix.service_name}}/Dockerfile -t ${{matrix.service_name}}:${{github.run_id}} -t ${{matrix.service_name}}:latest .
