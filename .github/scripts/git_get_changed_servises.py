@@ -26,7 +26,7 @@ def get_changed_services():
         )
     else:
         r = requests.get(
-            url=f"https://api.github.com/repos/Genvekt/task-tracker/compare/master...{sys.argv[1]}",
+            url=f"https://api.github.com/repos/Genvekt/task-tracker/compare/main...{sys.argv[1]}",
             headers={"authorization": f"Bearer {sys.argv[2]}"}
         )
     output = {"service_name": [], "library_name": []}
