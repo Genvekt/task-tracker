@@ -1,8 +1,9 @@
 from typing import Optional, List
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from accounting.auth.models import User
-from accounting.transaction.models import Transaction
+from accounting.transaction.models import Transaction, TransactionType
+from sqlalchemy.sql.functions import sum as sql_sum
 
 
 class TransactionRepository:
@@ -41,3 +42,33 @@ class UserRepository:
 
     def list(self) -> List[User]:
         return self.session.query(User).all()
+
+
+class SalaryPaymentRepository:
+    def __init__(self, session):
+        self.session = session
+
+    def list(self, date_: date) -> List[Transaction]:
+        date_start = datetime.combine(date_, datetime.min.time())
+        next_date_start = datetime.combine(date_+timedelta(days=1), datetime.min.time())
+
+        result: tuple[User, float] = self.session.query(
+            User,
+            sql_sum(Transaction.amount)
+        ).join(Transaction).where(
+            Transaction.ts >= date_start,
+            Transaction.ts < next_date_start
+        ).group_by(User).all()
+
+        return [
+            Transaction(
+                user=user,
+                type_=TransactionType.salary_payment,
+                ts=next_date_start,
+                amount=amount
+            )
+            for user, amount in result
+        ]
+
+    def add(self, salary: Transaction):
+        self.session.add(salary)

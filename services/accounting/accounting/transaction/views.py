@@ -1,7 +1,6 @@
-import asyncio
 from datetime import date
 
-from fastapi import Depends, APIRouter, HTTPException, Response
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from accounting.db.connection import get_db
@@ -31,5 +30,3 @@ async def task_list(
             return {"collection": []}
         else:
             return {"collection": trans_repo.list(user=user, date=date)}
-
-

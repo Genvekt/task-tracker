@@ -7,9 +7,16 @@ from accounting.auth.models import User
 class TransactionType(Enum):
     task_assigned = "TaskAssigned"
     task_completed = "TaskCompleted"
+    salary_payment = "SalaryPayment"
 
 
 class Transaction:
+    user: User
+    type: TransactionType
+    amount: float
+    ts: datetime
+    extra: dict
+
     def __init__(self, user: User, type_: TransactionType, amount: float, ts: datetime, extra: dict = None):
         if extra is None:
             extra = {}

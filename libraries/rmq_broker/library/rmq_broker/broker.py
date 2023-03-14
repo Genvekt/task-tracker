@@ -108,7 +108,9 @@ class Publisher:
         exchange_name: str,
         event_queue: asyncio.Queue[Event],
         logger: Logger,
-        schemas: Dict[str, Schema]
+        schemas: Dict[str, Schema],
+        queue_name: str | None = None,
+        routing_key: str | None = None
     ):
         """
         Publisher initialisation.
@@ -121,6 +123,8 @@ class Publisher:
         self._queue = event_queue
         self._schemas = schemas
         self._logger = logger
+        self._queue_name = queue_name
+        self._routing_key = routing_key
 
     async def start(self, is_stopped: asyncio.Future, connection: AbstractConnection):
         """
@@ -134,6 +138,10 @@ class Publisher:
             name=self._exchange_name,
             type=ExchangeType.FANOUT
         )
+        if self._queue is not None:
+            queue = await channel.declare_queue(self._queue_name, auto_delete=False)
+            await queue.bind(exchange, routing_key=self._routing_key)
+
         self._logger.info(f"Start publishing to '{self._exchange_name}' exchange.")
         while not is_stopped.done():
             finished, unfinished = await asyncio.wait([
@@ -213,6 +221,8 @@ class RMQBroker:
         exchange_name: str,
         event_queue: asyncio.Queue,
         schemas: Dict[str, Schema],
+        queue_name: str | None = None,
+        routing_key: str | None = None
     ):
         """
         Sets publisher to broker.
@@ -225,7 +235,9 @@ class RMQBroker:
             exchange_name=exchange_name,
             event_queue=event_queue,
             schemas=schemas,
-            logger=self._logger
+            logger=self._logger,
+            queue_name=queue_name,
+            routing_key=routing_key
         )
 
     async def start(self) -> None:

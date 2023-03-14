@@ -31,7 +31,7 @@ class TaskAssignedEvent(Event):
 
 
 @dataclass
-class AccountSummary(Event):
-    user_email: str
+class SalaryPaymentEvent(Event):
+    user_public_id: str
     date: date
     amount: float
