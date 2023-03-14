@@ -118,11 +118,11 @@ jobs:
         image: postgres
         # Creds for postgres
         env:
-          POSTGRES_DB: "db-test"
+          POSTGRES_DB: "test-db"
           POSTGRES_USER: "postgres"
-          POSTGRES_PASSWORD: "mysecretpassword"
+          POSTGRES_PASSWORD: "postgrespw"
         ports:
-          - "5432:5432"
+          - "5432:55000"
         # Health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
