@@ -126,7 +126,7 @@ class Publisher:
         self._queue_name = queue_name
         self._routing_key = routing_key
 
-    async def start(self, is_stopped: asyncio.Future, connection: AbstractConnection):
+    async def start(self, is_stopped: asyncio.Future, connection: AbstractConnection) -> None:
         """
         Trigger publisher start.
         Args:

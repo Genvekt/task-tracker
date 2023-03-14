@@ -173,12 +173,12 @@ jobs:
   # Job that builds service containers
   # Will start if:
   #  - List of changed services is NOT EMPTY
-  #  - Event type is workflow_dispatch (manual run) OR push made into master branch
+  #  - Event type is workflow_dispatch (manual run) OR push made into main branch
   #  - run_service_checks job is successful for all services in list
   #  - run_lib_checks job is successful for all changed libraries or is skipped
   build:
     needs: [define_service_list, run_lib_checks, run_service_checks]
-    if: ${{ always() && (toJSON(fromJSON(needs.define_service_list.outputs.matrix).service_name) != '[]') && (github.event_name == 'workflow_dispatch' || needs.define_service_list.outputs.branch == 'master') && (needs.run_lib_checks.result == 'success' || needs.run_lib_checks.result == 'skipped') && (needs.run_service_checks.result == 'success')}}
+    if: ${{ always() && (toJSON(fromJSON(needs.define_service_list.outputs.matrix).service_name) != '[]') && (github.event_name == 'workflow_dispatch' || needs.define_service_list.outputs.branch == 'main') && (needs.run_lib_checks.result == 'success' || needs.run_lib_checks.result == 'skipped') && (needs.run_service_checks.result == 'success')}}
     runs-on: [self-hosted, first]
     strategy:
       matrix:
