@@ -30,3 +30,13 @@ USER_EVENTS_QUEUE = os.getenv(
     "USER_EVENTS_QUEUE",
     "accounting_user_consumer"
 )
+
+NOTIFICATION_EXCHANGE = os.getenv(
+    "NOTIFICATION_EXCHANGE",
+    "notification_exchange"
+)
+
+NOTIFICATION_QUEUE = os.getenv(
+    "NOTIFICATION_QUEUE",
+    "notification_salary"
+)

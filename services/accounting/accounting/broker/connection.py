@@ -6,7 +6,7 @@ from aio_pika.exchange import ExchangeType
 
 from accounting.transaction.models import Transaction, TransactionType
 from library.rmq_broker.broker import RMQBroker
-from library.rmq_broker.events import UserCreatedEvent, TaskAssignedEvent, TaskCompletedEvent
+from library.rmq_broker.events import UserCreatedEvent, TaskAssignedEvent, TaskCompletedEvent, SalaryPaymentEvent
 from accounting import settings
 from accounting.auth.models import User
 from accounting.db.connection import SessionLocal
@@ -16,7 +16,7 @@ from marshmallow_dataclass import class_schema
 publisher_event_queue = asyncio.Queue()
 
 
-def get_rmq_broker() -> RMQBroker:
+def get_rmq_broker(event_queue: asyncio.Queue) -> RMQBroker:
     broker_logger = logging.getLogger("rmq_broker")
     broker = RMQBroker(
         rmq_url=settings.RABBITMQ_URL,
@@ -47,6 +47,15 @@ def get_rmq_broker() -> RMQBroker:
             TaskAssignedEvent.__name__: class_schema(TaskAssignedEvent)(),
             TaskCompletedEvent.__name__: class_schema(TaskCompletedEvent)(),
         }
+    )
+    broker.set_publisher(
+        exchange_name=settings.NOTIFICATION_EXCHANGE,
+        event_queue=event_queue,
+        schemas={
+            SalaryPaymentEvent.__name__: class_schema(SalaryPaymentEvent)(),
+        },
+        queue_name=settings.NOTIFICATION_QUEUE,
+        routing_key="*",
     )
     return broker
 

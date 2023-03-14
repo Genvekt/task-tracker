@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, date
 
 
 @dataclass
@@ -28,3 +28,10 @@ class TaskAssignedEvent(Event):
     description: str
     assignee_public_id: str
     ts: datetime
+
+
+@dataclass
+class SalaryPaymentEvent(Event):
+    user_public_id: str
+    date: date
+    amount: float
