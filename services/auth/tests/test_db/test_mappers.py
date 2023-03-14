@@ -9,9 +9,9 @@ def test_user_mapper_works(db_session):
             (2, 'developer')
     """)
     db_session.execute("""
-        INSERT INTO users (id, name, email, password) VALUES
-            (1, 'a', 'a', 'a'),
-            (2, 'b', 'b', 'b')
+        INSERT INTO users (id, name, email, password, public_id) VALUES
+            (1, 'a', 'a', 'a', '1'),
+            (2, 'b', 'b', 'b', '2')
     """)
     db_session.execute("""
        INSERT INTO user_to_role (user_id, role_id) VALUES
@@ -19,27 +19,36 @@ def test_user_mapper_works(db_session):
            (2, 1),
            (2, 2)
     """)
-    role_1 = Role()
-    role_1.name = "admin"
-    role_2 = Role()
-    role_2.name = "developer"
+    role_1 = Role(name="admin")
+    role_2 = Role(name="developer")
 
-    user_1 = User()
-    user_1.name = "a"
-    user_1.email = "a"
-    user_1.password = "a"
+    user_1 = User(
+        name="a",
+        email="a",
+        password="a",
+        public_id="1",
+        hash_password=False
+    )
     user_1.roles = [role_1]
 
-    user_2 = User()
-    user_1.name = "b"
-    user_1.email = "b"
-    user_1.password = "b"
-    user_1.roles = [role_1, role_2]
+    user_2 = User(
+        name="b",
+        email="b",
+        password="b",
+        public_id="2",
+        hash_password=False
+    )
+    user_2.roles = [role_1, role_2]
 
     expected_users = [user_1, user_2]
 
     user_repo = UserRepository(db_session)
     users = user_repo.list()
+
+    print(users[0].__dict__)
+    print(expected_users[0].__dict__)
+    print(users[1].__dict__)
+    print(expected_users[1].__dict__)
     assert users == expected_users
 
 
@@ -50,9 +59,9 @@ def test_user_mapper_add_role(db_session):
                 (2, 'developer')
         """)
     db_session.execute("""
-            INSERT INTO users (id, name, email, password) VALUES
-                (1, 'a', 'a', 'a'),
-                (2, 'b', 'b', 'b')
+            INSERT INTO users (id, name, email, password, public_id) VALUES
+                (1, 'a', 'a', 'a', '1'),
+                (2, 'b', 'b', 'b', '2')
         """)
     db_session.execute("""
            INSERT INTO user_to_role (user_id, role_id) VALUES
@@ -81,9 +90,9 @@ def test_user_mapper_delete_role(db_session):
                 (2, 'developer')
         """)
     db_session.execute("""
-            INSERT INTO users (id, name, email, password) VALUES
-                (1, 'a', 'a', 'a'),
-                (2, 'b', 'b', 'b')
+            INSERT INTO users (id, name, email, password, public_id) VALUES
+                (1, 'a', 'a', 'a', '1'),
+                (2, 'b', 'b', 'b', '2')
         """)
     db_session.execute("""
            INSERT INTO user_to_role (user_id, role_id) VALUES

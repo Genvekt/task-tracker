@@ -38,7 +38,7 @@ class UserRepository:
         if id > 0:
             return self.session.query(User).filter_by(id=id).first()
         else:
-            return self.session.query(User).where(User.email == email).first()
+            return self.session.query(User).where(User.email == email).order_by(User.email).first()
 
     def list(self) -> List[User]:
         return self.session.query(User).all()

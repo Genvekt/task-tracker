@@ -16,12 +16,21 @@ class Role:
 
 
 class User:
-    def __init__(self, public_id: str, name: str, email: str, password: str):
+    def __init__(
+        self,
+        public_id: str,
+        name: str,
+        email: str,
+        password: str,
+        hash_password: bool = True
+    ):
+        print(password)
         self.public_id = public_id
         self.name = name
         self.email = email
-        self.password = get_password_hash(password)
+        self.password = get_password_hash(password) if hash_password else password
         self.roles: list[Role] = []
+        print(self.password)
 
     def __eq__(self, other):
         return (
@@ -33,6 +42,8 @@ class User:
             and other.public_id == self.public_id
         )
 
+    def __str__(self):
+        return f"Name={self.name} email={self.email}"
 
 class Token:
     def __init__(self, access_token: str, token_type: str = 'bearer',):
