@@ -21,7 +21,7 @@ jobs:
       # Remember the name of branch
       - name: Identify branch name
         id: branch_name
-        run: echo "triggered_branch=${GITHUB_REF##*/}" >> $GITHUB_STATE
+        run: echo "triggered_branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
 
       # Identify changes
       - name: Find changed files
@@ -36,7 +36,7 @@ jobs:
       - name: Set matrix value
         id: set_matrix
         run: |
-          echo "changed_services=$MATRIX_JSON" >> $GITHUB_STATE
+          echo "changed_services=$MATRIX_JSON" >> $GITHUB_OUTPUT
 
   # Job that runs tests, flake8 and mypy for each changed library
   # Will start if
