@@ -95,7 +95,8 @@ jobs:
         run: |
           cd libraries/${{matrix.library_name}}
           source .venv/bin/activate
-          pytest tests
+          pip install pytest-custom_exit_code
+          pytest --suppress-no-test-exit-code tests
  
  
  
@@ -165,7 +166,8 @@ jobs:
         run: |
           cd services/${{matrix.service_name}}
           source .venv/bin/activate
-          pytest tests
+          pip install pytest-custom_exit_code
+          pytest --suppress-no-test-exit-code tests
 
 
 
