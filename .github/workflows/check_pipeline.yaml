@@ -122,7 +122,7 @@ jobs:
           POSTGRES_USER: "postgres"
           POSTGRES_PASSWORD: "postgrespw"
         ports:
-          - "5432:55000"
+          - "55000:5432"
         # Health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
