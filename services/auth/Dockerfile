@@ -23,6 +23,7 @@ RUN poetry --version \
   && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root/services/auth
+COPY ./libraries/rmq_broker /root/libraries/rmq_broker
 COPY ./services/auth /root/services/auth
 
 RUN poetry config virtualenvs.create false \

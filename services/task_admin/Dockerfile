@@ -23,6 +23,7 @@ RUN poetry --version \
   && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root/services/task_admin
+COPY ./libraries/rmq_broker /root/libraries/rmq_broker
 COPY ./services/task_admin /root/services/task_admin
 
 RUN poetry config virtualenvs.create false \
