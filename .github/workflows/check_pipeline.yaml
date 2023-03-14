@@ -158,21 +158,6 @@ jobs:
           poetry install --no-interaction --no-ansi -vvv
           rm -rf $POETRY_CACHE_DIR
 
-      # DOCS PUBLISH
-      #   Will run only on push to master or manual run
-      #   We do it here to reuse already installed packages and reduce workflow overall runtime
-      - name: Publish docs
-        if: ${{ always() && steps.check_docs_exist.outcome == 'success' && steps.check_docs_exist.outputs.files_exists == 'true' }}
-        continue-on-error: true
-        run: |
-          cd services/${{matrix.service_name}}
-          source .venv/bin/activate
-          sphinx-build -b confluence -c ../../docs/docs/source docs/source docs/build/confluence -E -a
-        env:
-          ATLASSIAN_API_KEY: ${{ secrets.ATLASSIAN_API_KEY }}
-          ATLASSIAN_EMAIL: ${{ secrets.ATLASSIAN_EMAIL }}
-          PUBLISH: 'True'
-
       - name: Run tests
         if: steps.check_tests_exist.outputs.files_exists == 'true'
         run: |

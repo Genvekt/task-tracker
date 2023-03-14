@@ -21,11 +21,13 @@ def is_library_exists(library_name: str) -> bool:
 def get_changed_services():
     if sys.argv[1] == "master":
         r = requests.get(
-            url=f"https://github.com/Genvekt/task-tracker/commits/{sys.argv[3]}"
+            url=f"https://api.github.com/repos/Genvekt/task-tracker/commits/{sys.argv[3]}",
+            headers={"authorization": f"Bearer {sys.argv[2]}"}
         )
     else:
         r = requests.get(
-            url=f"https://github.com/Genvekt/task-tracker/compare/master...{sys.argv[1]}"
+            url=f"https://api.github.com/repos/Genvekt/task-tracker/compare/master...{sys.argv[1]}",
+            headers={"authorization": f"Bearer {sys.argv[2]}"}
         )
     output = {"service_name": [], "library_name": []}
     if r.status_code == 200:
