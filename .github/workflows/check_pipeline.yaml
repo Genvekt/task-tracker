@@ -1,8 +1,7 @@
-name: Check Pipeline
-
+name: Tests and Build
 
 on:
-  push:                 # Automatic trigger on push to any branch
+  push:  # Automatic trigger on push to any branch
 
 jobs:
 
