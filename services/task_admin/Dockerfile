@@ -32,6 +32,7 @@ RUN poetry config virtualenvs.create false \
 
 
 ENV ADMIN_PASSWORD="admin-password-1234" \
-    DATABASE_URL="postgresql://postgres:postgrespw@postgres-k3zM:5432/task-admin"
+    DATABASE_URL="postgresql://postgres:postgrespw@postgres:5432/task-admin"
 
-CMD ["poetry", "run", "uvicorn", "task_admin.app:app", "--host", "0.0.0.0", "--port", "8000"]
+RUN ["chmod", "+x", "./docker-entrypoint.sh"]
+ENTRYPOINT [ "./docker-entrypoint.sh" ]

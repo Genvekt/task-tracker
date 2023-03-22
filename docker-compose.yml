@@ -1,0 +1,71 @@
+version: "3"
+volumes:
+  data:
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    user: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgrespw
+      - POSTGRES_USER=postgres
+      - PGDATA=/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./services/postgres/create_databases.sql:/docker-entrypoint-initdb.d/create_databases.sql
+      - data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+    networks:
+    - task-tracker-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - task-tracker-network
+  task-admin:
+    container_name: task-admin
+    build:
+      context: .
+      dockerfile: services/task_admin/Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - task-tracker-network
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: always
+  front:
+    container_name: front
+    build:
+      context: .
+      dockerfile: services/front/Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - task-tracker-network
+  auth:
+    container_name: auth
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - task-tracker-network
+
+networks:
+  task-tracker-network:
+    driver: bridge

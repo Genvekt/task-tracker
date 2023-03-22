@@ -11,3 +11,9 @@ data in PostgreSQL databases and communicate asynchronously through RabbitMQ.
 For detailed discribtion look at `services/READ.me`.
 ![](media/system-diagram.png)
 
+## Run
+It is possible to run system with Docker Compose from the project root:
+```shell
+docker-compose up --build
+```
+

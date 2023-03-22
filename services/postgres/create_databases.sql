@@ -1,0 +1,3 @@
+CREATE DATABASE "task-admin";
+CREATE DATABASE "auth";
+CREATE DATABASE "accounting";
