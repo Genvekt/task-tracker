@@ -27,7 +27,3 @@ class TaskSchema(TaskBaseSchema):
     class Config:
         orm_mode = True
         use_enum_values = True
-
-
-class TaskListSchema(BaseModel):
-    collection: list[TaskSchema]

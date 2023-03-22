@@ -22,13 +22,22 @@ services:
       timeout: 60s
       retries: 5
     networks:
-    - task-tracker-network
+      - task-tracker-network
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
       - "15672:15672"
       - "5672:5672"
+    networks:
+      - task-tracker-network
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: ./services/api_gateway/Dockerfile
+    ports:
+      - "8081:8080"
     networks:
       - task-tracker-network
   task-admin:
@@ -69,3 +78,4 @@ services:
 networks:
   task-tracker-network:
     driver: bridge
+    external: true

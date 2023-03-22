@@ -6,7 +6,7 @@ import logging
 from task_admin.broker.connection import get_rmq_broker
 from task_admin.tasks.views import router as task_router
 from task_admin.auth.views import router as user_router
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 logging.config.fileConfig('task_admin/logging.conf', disable_existing_loggers=False)
 
 app = FastAPI()
