@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from auth import settings
+from auth.settings import USER_EVENTS_QUEUES
 from library.rmq_broker.broker import RMQBroker
 from library.rmq_broker.events import Event, UserCreatedEvent
 from marshmallow_dataclass import class_schema
@@ -20,6 +21,8 @@ def get_rmq_broker() -> RMQBroker:
         event_queue=publisher_event_queue,
         schemas={
             UserCreatedEvent.__name__: class_schema(UserCreatedEvent)(),
-        }
+        },
+        queue_names=USER_EVENTS_QUEUES,
+        routing_key="*"
     )
     return broker

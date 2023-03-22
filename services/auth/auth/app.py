@@ -3,6 +3,7 @@ import asyncio
 from fastapi import FastAPI
 
 from auth.broker.connection import get_rmq_broker
+from auth.db.connection import SessionLocal
 from auth.views import user_router, auth_router
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -11,7 +12,7 @@ app = FastAPI()
 broker = get_rmq_broker()
 
 from auth.services.user import add_admin_user
-add_admin_user()
+
 
 app.include_router(user_router)
 app.include_router(auth_router)
@@ -31,6 +32,7 @@ app.add_middleware(
 @app.on_event('startup')
 async def start_up():
     loop = asyncio.get_running_loop()
+    loop.create_task(add_admin_user(db=SessionLocal()))
     loop.create_task(broker.start())
 
 

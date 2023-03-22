@@ -1,3 +1,4 @@
+import json
 import os
 
 
@@ -31,3 +32,8 @@ USER_EVENTS_EXCHANGE = os.getenv(
     "USER_EVENTS_EXCHANGE",
     "user_events_exchange"
 )
+
+USER_EVENTS_QUEUES = json.loads(os.getenv(
+    "USER_EVENTS_QUEUES",
+    '["task_admin_consumer", "accounting_consumer"]'
+))
