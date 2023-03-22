@@ -54,7 +54,7 @@ def get_rmq_broker(event_queue: asyncio.Queue) -> RMQBroker:
         schemas={
             SalaryPaymentEvent.__name__: class_schema(SalaryPaymentEvent)(),
         },
-        queue_name=settings.NOTIFICATION_QUEUE,
+        queue_names=[settings.NOTIFICATION_QUEUE],
         routing_key="*",
     )
     return broker

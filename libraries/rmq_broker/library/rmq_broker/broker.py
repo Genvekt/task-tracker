@@ -108,7 +108,7 @@ class Publisher:
         event_queue: asyncio.Queue[Event],
         logger: Logger,
         schemas: Dict[str, Schema],
-        queue_name: str | None = None,
+        queue_names: list[str] = None,
         routing_key: str | None = None
     ):
         """
@@ -122,7 +122,7 @@ class Publisher:
         self._queue = event_queue
         self._schemas = schemas
         self._logger = logger
-        self._queue_name = queue_name
+        self._queue_names = queue_names if queue_names is not None else []
         self._routing_key = routing_key
 
     async def start(self, is_stopped: asyncio.Future, connection: AbstractConnection) -> None:
@@ -138,8 +138,9 @@ class Publisher:
             type=ExchangeType.FANOUT
         )
         if self._queue is not None:
-            queue = await channel.declare_queue(self._queue_name, auto_delete=False)
-            await queue.bind(exchange, routing_key=self._routing_key)
+            for queue_name in self._queue_names:
+                queue = await channel.declare_queue(queue_name, auto_delete=False)
+                await queue.bind(exchange, routing_key=self._routing_key)
 
         self._logger.info(f"Start publishing to '{self._exchange_name}' exchange.")
         while not is_stopped.done():
@@ -220,7 +221,7 @@ class RMQBroker:
         exchange_name: str,
         event_queue: asyncio.Queue,
         schemas: Dict[str, Schema],
-        queue_name: str | None = None,
+        queue_names: list[str] = None,
         routing_key: str | None = None
     ) -> None:
         """
@@ -229,15 +230,15 @@ class RMQBroker:
             exchange_name: Name of exchange for publishing
             event_queue: Internal queue with events to publish
             schemas: Mapping from string type to the Event schema
-            queue_name (optional): Optional queue to bind with auto_delete=False
-            routing_key (optional): Routing key for optional queue
+            queue_names (optional): Optional list of queues to bind with auto_delete=False
+            routing_key (optional): Routing key for optional queues
         """
         self.publisher = Publisher(
             exchange_name=exchange_name,
             event_queue=event_queue,
             schemas=schemas,
             logger=self._logger,
-            queue_name=queue_name,
+            queue_names=queue_names,
             routing_key=routing_key
         )
 

@@ -142,11 +142,11 @@
     {
       "endpoint": "/v1/task-admin/tasks/reassign",
       "method": "POST",
-      "output_encoding": "json",
+      "output_encoding": "string",
       "backend": [
         {
           "url_pattern": "/api/tasks/reassign",
-          "encoding": "json",
+          "encoding": "string",
           "sd": "static",
           "method": "POST",
           "host": [

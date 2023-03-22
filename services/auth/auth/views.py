@@ -13,7 +13,7 @@ from auth.models import User
 from auth.schemas import TokenSchema, UserSchema, UserCreateSchema, UserUpdateSchema, JWK
 from auth.services.hash import verify_password
 from auth.services.token import create_access_token, generate_jwk, get_jwk_fingerprint
-from auth.services.user import authenticate_user, authenticate_admin_user
+from auth.services.user import add_user, authenticate_user, authenticate_admin_user
 from auth.settings import ACCESS_TOKEN_EXPIRES
 
 user_router = APIRouter(
@@ -52,20 +52,14 @@ async def user_create(
     if auth_user is None:
         raise HTTPException(status_code=403)
 
-    user_repo = UserRepository(db)
-    user = User(
-        public_id=str(uuid.uuid4()),
+    await add_user(
         name=data.name,
         email=data.email,
-        password=data.password
+        password=data.password,
+        roles=[],
+        db=db,
     )
-    user_repo.add(user)
-    db.commit()
-    await publisher_event_queue.put(UserCreatedEvent(
-        public_id=user.public_id,
-        name=user.name,
-        email=user.email,
-    ))
+
     return "0k", 200
 
 

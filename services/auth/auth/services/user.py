@@ -4,10 +4,14 @@ from sqlalchemy.orm import Session
 
 from jwt import DecodeError
 
+from auth.broker.connection import publisher_event_queue
+from auth.db.connection import SessionLocal
+
 from auth.db.repositories import UserRepository, RoleRepository
-from auth.models import User
+from auth.models import Role, User
 from auth.services.token import decode_token
 from auth.settings import ADMIN_PASSWORD
+from library.rmq_broker.events import UserCreatedEvent
 
 
 def authenticate_user(token: str, db: Session) -> Optional[User]:
@@ -36,26 +40,43 @@ def authenticate_admin_user(token: str, db: Session) -> Optional[User]:
     return user
 
 
-def add_admin_user():
-    from auth.db.connection import get_db
-    db = next(get_db())
-    user_repo = UserRepository(db)
-    if user_repo.get(email="admin@email.com") is not None:
-        # Admin already exists
-        return
-
-    user = User(
-        public_id=str(uuid.uuid4()),
-        name="Admin",
-        email="admin@email.com",
-        password=ADMIN_PASSWORD
-    )
-
+async def add_admin_user(db: Session):
     role_repo = RoleRepository(db)
     admin_role = role_repo.get_admin()
     if admin_role is None:
         admin_role = role_repo.add_admin()
 
-    user.roles.append(admin_role)
-    user_repo.add(user)
+    await add_user(
+        name="Admin",
+        email="admin@email.com",
+        password=ADMIN_PASSWORD,
+        roles=[admin_role],
+        db=db,
+    )
     db.commit()
+
+
+async def add_user(name: str, email: str, password: str, roles: list[Role], db: Session):
+    user_repo = UserRepository(db)
+    if user_repo.get(email=email) is not None:
+        # User already exists
+        return None
+
+    user = User(
+        public_id=str(uuid.uuid4()),
+        name=name,
+        email=email,
+        password=password
+    )
+    user_repo.add(user)
+    user.roles = roles
+    db.commit()
+
+    # Notify that new user was added
+    await publisher_event_queue.put(UserCreatedEvent(
+        public_id=user.public_id,
+        name=user.name,
+        email=user.email,
+    ))
+
+    return user

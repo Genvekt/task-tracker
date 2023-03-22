@@ -17,8 +17,8 @@ TASK_EVENTS_EXCHANGE = os.getenv(
 )
 
 TASK_EVENTS_QUEUE = os.getenv(
-    "USER_EVENTS_QUEUE",
-    "accounting_task_consumer"
+    "TASK_EVENTS_QUEUE",
+    "accounting_consumer"
 )
 
 USER_EVENTS_EXCHANGE = os.getenv(
@@ -28,7 +28,7 @@ USER_EVENTS_EXCHANGE = os.getenv(
 
 USER_EVENTS_QUEUE = os.getenv(
     "USER_EVENTS_QUEUE",
-    "accounting_user_consumer"
+    "accounting_consumer"
 )
 
 NOTIFICATION_EXCHANGE = os.getenv(
