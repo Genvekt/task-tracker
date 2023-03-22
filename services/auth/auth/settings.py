@@ -24,7 +24,7 @@ PUBLIC_KEY_PATH = os.getenv(
 
 RABBITMQ_URL = os.getenv(
     "RABBITMQ_URL",
-    "amqp://guest:guest@127.0.0.1:5672"
+    "amqp://guest:guest@rabbitmq:5672"
 )
 
 USER_EVENTS_EXCHANGE = os.getenv(

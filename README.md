@@ -11,3 +11,14 @@ data in PostgreSQL databases and communicate asynchronously through RabbitMQ.
 For detailed discribtion look at `services/READ.me`.
 ![](media/system-diagram.png)
 
+## Run
+It is possible to run system with Docker Compose from the project root:
+1. Images use default host and custom bridge network. To create bridge network, run:
+```shell
+docker network create -d bridge task-tracker-network
+```
+2. With created networks, next command will start everything:
+```shell
+docker-compose up --build
+```
+

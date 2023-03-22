@@ -8,7 +8,7 @@ from fastapi import Depends, APIRouter, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from task_admin.tasks.models import Task, TaskStatus
-from task_admin.tasks.schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema, TaskListSchema
+from task_admin.tasks.schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema
 from task_admin.tasks.services import reassign_open_tasks
 from task_admin.broker.connection import publisher_event_queue
 
@@ -18,10 +18,10 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=TaskListSchema)
+@router.get("", response_model=list[TaskSchema])
 async def task_list(db: Session = Depends(get_db)):
     task_repo = TaskRepository(db)
-    return {"collection": task_repo.list()}
+    return task_repo.list()
 
 
 @router.get("/{task_id}", response_model=TaskSchema)
@@ -33,7 +33,7 @@ async def task_get(task_id: int, db: Session = Depends(get_db)):
     return task
 
 
-@router.post("/", response_model=TaskSchema)
+@router.post("", response_model=TaskSchema)
 async def task_create(data: TaskCreateSchema, db: Session = Depends(get_db)):
     task_repo = TaskRepository(db)
     task = Task(

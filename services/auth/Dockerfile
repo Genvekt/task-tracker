@@ -37,8 +37,9 @@ RUN openssl genrsa -out /root/services/auth/auth/data/jwt-key 4096 \
     && openssl rsa -in /root/services/auth/auth/data/jwt-key -pubout > /root/services/auth/auth/data/jwt-key.pub
 
 ENV ADMIN_PASSWORD="admin-password-1234" \
-    DATABASE_URL="postgresql://postgres:postgrespw@postgres-k3zM:5432/auth" \
+    DATABASE_URL="postgresql://postgres:postgrespw@postgres:5432/auth" \
     PRIVATE_KEY_PATH="/root/services/auth/auth/data/jwt-key" \
     PUBLIC_KEY_PATH="/root/services/auth/auth/data/jwt-key.pub"
 
-CMD ["poetry", "run", "uvicorn", "auth.app:app", "--host", "0.0.0.0", "--port", "5000"]
+RUN ["chmod", "+x", "./docker-entrypoint.sh"]
+ENTRYPOINT [ "./docker-entrypoint.sh" ]
