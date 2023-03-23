@@ -22,3 +22,10 @@ docker network create -d bridge task-tracker-network
 docker-compose up --build
 ```
 
+## TODO
+- [ ] Use user pablic id in all user endpoints
+- [ ] Accounting system logic
+- [ ] Dockerize Accounting
+- [ ] Notification service
+- [ ] Analytics service
+- [ ] Env files
