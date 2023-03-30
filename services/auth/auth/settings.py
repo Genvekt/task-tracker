@@ -30,7 +30,7 @@ RABBITMQ_URL = os.getenv(
 
 USER_EVENTS_EXCHANGE = os.getenv(
     "USER_EVENTS_EXCHANGE",
-    "user_events_exchange"
+    "auth_user_events"
 )
 
 USER_EVENTS_QUEUES = json.loads(os.getenv(
