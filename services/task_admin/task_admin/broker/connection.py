@@ -37,7 +37,9 @@ def get_rmq_broker() -> RMQBroker:
         schemas={
             TaskAssignedEvent.__name__: class_schema(TaskAssignedEvent)(),
             TaskCompletedEvent.__name__: class_schema(TaskCompletedEvent)()
-        }
+        },
+        queue_names=[settings.ACCOUNTING_QUEUE],
+        routing_key="*"
     )
     return broker
 

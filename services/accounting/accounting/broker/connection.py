@@ -49,7 +49,7 @@ def get_rmq_broker(event_queue: asyncio.Queue) -> RMQBroker:
         }
     )
     broker.set_publisher(
-        exchange_name=settings.NOTIFICATION_EXCHANGE,
+        exchange_name=settings.ACCOUNTING_EXCHANGE,
         event_queue=event_queue,
         schemas={
             SalaryPaymentEvent.__name__: class_schema(SalaryPaymentEvent)(),

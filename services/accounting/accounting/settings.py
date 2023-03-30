@@ -13,7 +13,7 @@ RABBITMQ_URL = os.getenv(
 
 TASK_EVENTS_EXCHANGE = os.getenv(
     "TASK_EVENTS_EXCHANGE",
-    "task_events_exchange"
+    "task_admin_task_events"
 )
 
 TASK_EVENTS_QUEUE = os.getenv(
@@ -23,7 +23,7 @@ TASK_EVENTS_QUEUE = os.getenv(
 
 USER_EVENTS_EXCHANGE = os.getenv(
     "USER_EVENTS_EXCHANGE",
-    "user_events_exchange"
+    "auth_user_events"
 )
 
 USER_EVENTS_QUEUE = os.getenv(
@@ -31,12 +31,12 @@ USER_EVENTS_QUEUE = os.getenv(
     "accounting_consumer"
 )
 
-NOTIFICATION_EXCHANGE = os.getenv(
+ACCOUNTING_EXCHANGE = os.getenv(
     "NOTIFICATION_EXCHANGE",
-    "notification_exchange"
+    "accounting_events"
 )
 
 NOTIFICATION_QUEUE = os.getenv(
     "NOTIFICATION_QUEUE",
-    "notification_salary"
+    "notification_consumer"
 )

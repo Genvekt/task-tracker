@@ -2,6 +2,8 @@
 All microservices of the task-tracker system.
 
 Each service is the poetry project with its onw dependencies. Services are independent and do not import each other. 
+The only one dependence - rmq queues, that are created by publishers to 
+avoid messages lost.
 
 ## Description
 
